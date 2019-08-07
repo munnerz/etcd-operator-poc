@@ -1,0 +1,166 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  name: etcdclusters.etcd.improbable.io
+spec:
+  group: etcd.improbable.io
+  names:
+    kind: EtcdCluster
+    plural: etcdclusters
+  scope: ""
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      description: EtcdCluster is the Schema for the etcdclusters API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: EtcdClusterSpec defines the desired state of EtcdCluster
+          properties:
+            image:
+              description: Image is the docker image to use for EtcdPeer resources
+                in this cluster
+              type: string
+            replicas:
+              description: Number of replicas in the cluster This is a required field
+                for now. In future it will be default to 3.
+              format: int32
+              type: integer
+            resources:
+              description: Compute Resources required for the etcd container. Updating
+                this field is currently not supported.
+              properties:
+                limits:
+                  additionalProperties:
+                    type: string
+                  description: 'Limits describes the maximum amount of compute resources
+                    allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                  type: object
+                requests:
+                  additionalProperties:
+                    type: string
+                  description: 'Requests describes the minimum amount of compute resources
+                    required. If Requests is omitted for a container, it defaults
+                    to Limits if that is explicitly specified, otherwise to an implementation-defined
+                    value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                  type: object
+              type: object
+            selector:
+              description: Selector must be specified as it'll be set as a label on
+                the EtcdPeer resources the controller creates, and used as a selector
+                for the headless service created for the cluster nodes.
+              properties:
+                matchExpressions:
+                  description: matchExpressions is a list of label selector requirements.
+                    The requirements are ANDed.
+                  items:
+                    description: A label selector requirement is a selector that contains
+                      values, a key, and an operator that relates the key and values.
+                    properties:
+                      key:
+                        description: key is the label key that the selector applies
+                          to.
+                        type: string
+                      operator:
+                        description: operator represents a key's relationship to a
+                          set of values. Valid operators are In, NotIn, Exists and
+                          DoesNotExist.
+                        type: string
+                      values:
+                        description: values is an array of string values. If the operator
+                          is In or NotIn, the values array must be non-empty. If the
+                          operator is Exists or DoesNotExist, the values array must
+                          be empty. This array is replaced during a strategic merge
+                          patch.
+                        items:
+                          type: string
+                        type: array
+                    required:
+                    - key
+                    - operator
+                    type: object
+                  type: array
+                matchLabels:
+                  additionalProperties:
+                    type: string
+                  description: matchLabels is a map of {key,value} pairs. A single
+                    {key,value} in the matchLabels map is equivalent to an element
+                    of matchExpressions, whose key field is "key", the operator is
+                    "In", and the values array contains only "value". The requirements
+                    are ANDed.
+                  type: object
+              type: object
+            tls:
+              description: TLS configuration for the etcd cluster. If specified, the
+                cluster will use TLS certificates issued by the given cert-manager
+                issuer.
+              properties:
+                group:
+                  description: Group of the issuer resource to obtain certificates
+                    from
+                  type: string
+                kind:
+                  description: Kind of the issuer resource to obtain certificates
+                    from
+                  type: string
+                name:
+                  description: Name of the issuer resource to obtain certificates
+                    from
+                  type: string
+              required:
+              - group
+              - kind
+              - name
+              type: object
+          required:
+          - image
+          - replicas
+          - selector
+          type: object
+        status:
+          description: EtcdClusterStatus defines the observed state of EtcdCluster
+          properties:
+            members:
+              description: Members is a list of members in this cluster as returned
+                by the etcd membership API.
+              items:
+                properties:
+                  id:
+                    description: The machine identifier for the etcd peer
+                    type: string
+                  name:
+                    description: The human readable name of the member. The name field
+                      will not be specified if the member has not been observed in
+                      the etcd cluster yet.
+                    type: string
+                required:
+                - id
+                type: object
+              type: array
+          type: object
+      type: object
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

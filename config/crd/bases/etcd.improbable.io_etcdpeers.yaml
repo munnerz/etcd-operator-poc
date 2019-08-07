@@ -1,0 +1,94 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  name: etcdpeers.etcd.improbable.io
+spec:
+  group: etcd.improbable.io
+  names:
+    kind: EtcdPeer
+    plural: etcdpeers
+  scope: ""
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      description: EtcdPeer is the Schema for the etcdpeers API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: EtcdPeerSpec defines the desired state of EtcdPeer
+          properties:
+            bootstrap:
+              description: Bootstrap defines enough bootstrap configuration for this
+                peer to join an existing cluster or form a new one if needed. This
+                configuration is only used when a new cluster is created or when a
+                new peer is being introduced, so it will not be on existing Pod resources
+                if it is updated.
+              properties:
+                static:
+                  description: Static contains bootstrap configuration that can be
+                    used to bootstrap an etcd cluster using 'static' peer configuration.
+                  properties:
+                    initialClusterPeers:
+                      description: The initial list of peers in the cluster used when
+                        bootstrapping a peer.
+                      items:
+                        description: PeerAddress contains connection details for a
+                          peer
+                        properties:
+                          address:
+                            description: Address is the connection string for the
+                              peer's peer endpoint.
+                            type: string
+                          name:
+                            description: Name of the peer
+                            type: string
+                        required:
+                        - address
+                        - name
+                        type: object
+                      type: array
+                  type: object
+              required:
+              - static
+              type: object
+            clusterName:
+              description: ClusterName is the name of the cluster, used as the initial-cluster-token
+                and used as part of the DNS name for each pod.
+              type: string
+            image:
+              description: Image is the docker image to use for this EtcdPeer.
+              type: string
+          required:
+          - bootstrap
+          - clusterName
+          - image
+          type: object
+        status:
+          description: EtcdPeerStatus defines the observed state of EtcdPeer
+          type: object
+      type: object
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

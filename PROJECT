@@ -1,0 +1,10 @@
+version: "2"
+domain: improbable.io
+repo: github.com/munnerz/etcd-operator
+resources:
+- group: etcd
+  version: v1alpha1
+  kind: EtcdCluster
+- group: etcd
+  version: v1alpha1
+  kind: EtcdPeer

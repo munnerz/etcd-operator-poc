@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: etcdpeer-sample
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  ports:
+    - name: peer
+      port: 2380
+      protocol: TCP
+  selector:
+    cluster: etcdpeer-sample
+
+---
+
+apiVersion: etcd.improbable.io/v1alpha1
+kind: EtcdPeer
+metadata:
+  name: etcdpeer-sample-0
+  annotations:
+    etcd.improbable.io/bootstrap: "true"
+  labels:
+    cluster: etcdpeer-sample
+spec:
+  clusterName: etcdpeer-sample
+  image: quay.io/coreos/etcd:v3.3.13
+  bootstrap:
+    static:
+      initialClusterPeers:
+        - name: etcdpeer-sample-0
+          address: http://etcdpeer-sample-0.etcdpeer-sample.default:2380
+        - name: etcdpeer-sample-1
+          address: http://etcdpeer-sample-1.etcdpeer-sample.default:2380
+        - name: etcdpeer-sample-2
+          address: http://etcdpeer-sample-2.etcdpeer-sample.default:2380
+
+---
+
+apiVersion: etcd.improbable.io/v1alpha1
+kind: EtcdPeer
+metadata:
+  name: etcdpeer-sample-1
+  annotations:
+    etcd.improbable.io/bootstrap: "true"
+  labels:
+    cluster: etcdpeer-sample
+spec:
+  clusterName: etcdpeer-sample
+  image: quay.io/coreos/etcd:v3.3.13
+  bootstrap:
+    static:
+      initialClusterPeers:
+        - name: etcdpeer-sample-0
+          address: http://etcdpeer-sample-0.etcdpeer-sample.default:2380
+        - name: etcdpeer-sample-1
+          address: http://etcdpeer-sample-1.etcdpeer-sample.default:2380
+        - name: etcdpeer-sample-2
+          address: http://etcdpeer-sample-2.etcdpeer-sample.default:2380
+
+---
+
+apiVersion: etcd.improbable.io/v1alpha1
+kind: EtcdPeer
+metadata:
+  name: etcdpeer-sample-3
+  labels:
+    cluster: etcdpeer-sample
+spec:
+  clusterName: etcdpeer-sample
+  image: quay.io/coreos/etcd:v3.3.13
+  bootstrap:
+    static:
+      initialClusterPeers:
+        - name: etcdpeer-sample-0
+          address: http://etcdpeer-sample-0.etcdpeer-sample.default:2380
+        - name: etcdpeer-sample-1
+          address: http://etcdpeer-sample-1.etcdpeer-sample.default:2380
+        - name: etcdpeer-sample-2
+          address: http://etcdpeer-sample-2.etcdpeer-sample.default:2380
+        - name: etcdpeer-sample-3
+          address: http://etcdpeer-sample-3.etcdpeer-sample.default:2380
