@@ -68,6 +68,17 @@ type EtcdClusterStatus struct {
 	// membership API.
 	// +optional
 	Members []EtcdMemberStatus `json:"members,omitempty"`
+
+	// Selector is the string form of the label selector used to match peers
+	// in this cluster.
+	// This is used to enable horizontal-pod-autoscaling of EtcdClusters.
+	// +optional
+	Selector string `json:"selector,omitempty"`
+
+	// Replicas is the number of EtcdPeer resources that exist in the cluster.
+	// +kubebuilder:validation:Minimum=0
+	// +optional
+	Replicas int32 `json:"replicas,omitempty"`
 }
 
 type EtcdMemberStatus struct {
@@ -87,6 +98,7 @@ type EtcdMemberStatus struct {
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
+// +kubebuilder:subresource:scale:specpath=.spec.replicas,statuspath=.status.replicas,selectorpath=.status.selector
 
 // EtcdCluster is the Schema for the etcdclusters API
 type EtcdCluster struct {

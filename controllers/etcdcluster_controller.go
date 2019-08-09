@@ -611,6 +611,13 @@ func (r *EtcdClusterReconciler) updateStatus(ctx context.Context, log logr.Logge
 		return err
 	}
 
+	sel, err := metav1.LabelSelectorAsSelector(cluster.Spec.Selector)
+	if err != nil {
+		return err
+	}
+	cluster.Status.Selector = sel.String()
+	cluster.Status.Replicas = int32(len(existingPeers))
+
 	return r.Client.Status().Update(ctx, cluster)
 }
 

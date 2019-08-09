@@ -12,6 +12,10 @@ spec:
     plural: etcdclusters
   scope: ""
   subresources:
+    scale:
+      labelSelectorPath: .status.selector
+      specReplicasPath: .spec.replicas
+      statusReplicasPath: .status.replicas
     status: {}
   validation:
     openAPIV3Schema:
@@ -148,10 +152,26 @@ spec:
                       will not be specified if the member has not been observed in
                       the etcd cluster yet.
                     type: string
+                  peerURLs:
+                    description: PeerURLs is a list of peer URL addresses for this
+                      peer
+                    items:
+                      type: string
+                    type: array
                 required:
                 - id
                 type: object
               type: array
+            replicas:
+              description: Replicas is the number of EtcdPeer resources that exist
+                in the cluster.
+              format: int32
+              type: integer
+            selector:
+              description: Selector is the string form of the label selector used
+                to match peers in this cluster. This is used to enable horizontal-pod-autoscaling
+                of EtcdClusters.
+              type: string
           type: object
       type: object
   versions:
