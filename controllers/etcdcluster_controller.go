@@ -667,8 +667,7 @@ func buildMemberList(ctx context.Context, log logr.Logger, existingPeers []etcdv
 
 		peerID := peer.Annotations[etcdPeerIDAnnotationKey]
 		// if this member's ID already features, the member has been registered
-		// into the cluster but has not started yet, so inject a synthetic
-		// member status that sets 'initialised' to false.
+		// into the cluster but has not started yet.
 		if m, ok := membersByID[peerID]; ok {
 			m.Name = peer.Name
 			continue
